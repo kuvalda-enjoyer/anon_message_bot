@@ -1,13 +1,11 @@
 import asyncio
 from aiogram import Dispatcher, types
 from aiogram.filters.command import Command
-from backend.createBot import createBot
-
+from backend.bot.createBot import createBot
+from backend import functions
 
 async def main():
-    # Объект бота
     bot = createBot()
-    # Диспетчер
     dp = Dispatcher(parse_mode="HTML")
     @dp.message(Command("start"))
     async def start(message: types.Message):

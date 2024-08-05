@@ -1,35 +1,39 @@
 import asyncio
-from aiogram import Dispatcher, types
+import os
+from dotenv import load_dotenv
+from aiogram import Dispatcher, types, F
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.filters.command import Command
 from backend.bot.createBot import createBot
 from backend.states.state import SendingPost
-from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
+from aiogram.fsm.storage.memory import MemoryStorage
 
 bot = createBot()
-dp = Dispatcher(parse_mode="HTML")
+load_dotenv()
+ADMIN = os.getenv('ADMIN_ID')
+dp = Dispatcher(parse_mode="HTML", storage=MemoryStorage())
+orf_link = "\r\n(орф. сохранена)\r\n<a href='https://t.me/anon_predlozhka_gugr_bot'>Анонимная предложка</a>"
 
-@dp.message(Command("start"))
+@dp.message(F.text, Command("start"))
 async def start(message: types.Message):
     await message.answer("Жопа какащке писи попи")
 
-@dp.message(Command("send_post"))
+@dp.message(F.text, Command("send_post"))
 async def send_post(message: Message, state: FSMContext):
+    await state.set_state(SendingPost.START)
     await message.answer("Напишите сообщение, которое хотите отправить")
     await state.set_state(SendingPost.GET_POST)
 
-@dp.message(SendingPost.GET_POST)
+@dp.message(F.text, SendingPost.GET_POST)
 async def confifm_post(message: Message, state: FSMContext):
-    btns = [[KeyboardButton(text="Отправить✅"), KeyboardButton(text="Отменить❌")]]
-    kb = ReplyKeyboardMarkup(keyboard=btns, resize_keyboard=True, one_time_keyboard=True)
-    await message.answer(f"Вы собираетесь отправить это сообщение:\r\n{message.text}", reply_markup=kb)
-    if message.text == "Отправить✅":
-        await state.update_data(post=message.text)
-        await state.set_state(SendingPost.GET_CONFIRM)
-
-# @dp.message(SendingPost.GET_CONFIRM)
-# async def send_to_admin(message: Message, state: FSMContext):
+    await state.update_data(post=message.text)
+    context_data = await state.get_data()
+    post = context_data.get('post')
+    await bot.send_message(ADMIN, "<i>В предложке появился новый пост!</i>")
+    await bot.send_message(ADMIN, f"{post}{orf_link}")
+    await message.answer("Ваш пост отправлен в предложку!")
+    await state.clear()
 
    
 async def main():

@@ -17,7 +17,7 @@ orf_link = "\r\n(орф. сохранена)\r\n<a href='https://t.me/anon_predl
 
 @dp.message(F.text, Command("start"))
 async def start(message: types.Message):
-    await message.answer("Жопа какащке писи попи")
+    await message.answer("Вас приветствует анонимная предложка Базы ГУГР. Для отправки поста пришлите команду /send_post.")
 
 @dp.message(F.text, Command("send_post"))
 async def send_post(message: Message, state: FSMContext):

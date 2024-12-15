@@ -4,3 +4,4 @@ class SendingPost(StatesGroup):
     GET_POST = State()
     GET_CONFIRM = State()
     SEND_MEDIA_GROUP = State()
+    WAITING = State()

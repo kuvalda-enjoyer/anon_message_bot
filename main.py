@@ -9,18 +9,17 @@ from aiogram.filters.command import Command
 from backend.bot.createBot import createBot
 from backend.states.state import SendingPost
 from backend.classes.middleware import MediaMiddleware
-# from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.media_group import MediaGroupBuilder
-from aiogram_sqlite_storage.sqlitestore import SQLStorage
+from aiogram.fsm.storage.memory import MemoryStorage
 # from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
 
 bot = createBot()
 load_dotenv()
-ADMIN = os.getenv('ADMIN_ID')
-sql_storage = SQLStorage('storage.db')
-dp = Dispatcher(parse_mode="HTML", storage=sql_storage)
-orf_link = "\r\n\r\n(орф. сохранена)\r\n<a href='https://t.me/anon_predlozhka_gugr_bot'>Анонимная предложка</a>"
+ADMIN = os.getenv('ADMIN')
+storage = MemoryStorage()
+dp = Dispatcher(parse_mode="HTML", storage=storage)
+orf_link = "\r\n\r\n(орф. сохранена)\r\n<a href='https://github.com/kuvalda-enjoyer/anon_message_bot'>Анонимная предложка</a>"
 
 @dp.message(F.text, Command("start"))
 async def start(message: types.Message, state: FSMContext):
@@ -66,7 +65,7 @@ async def send_text(message: Message, state: FSMContext):
     await message.answer("Если хотите отправить ещё одно сообщение, просто напишите его")
     await state.set_state(SendingPost.WAITING)
 
-# отправка одинарных файлов
+# отправка файлов
 @dp.message(SendingPost.WAITING)
 async def send_text(message: Message, state: FSMContext):
     m_capt = message.caption
